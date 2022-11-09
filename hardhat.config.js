@@ -3,17 +3,16 @@ require("@nomiclabs/hardhat-etherscan")
 require("hardhat-gas-reporter")
 require("solidity-coverage")
 require("hardhat-deploy")
-require("hardhat-contract-sizer")
 require("@nomiclabs/hardhat-waffle")
 
 module.exports = {
     solidity: {
         compilers: [
             {
-                version: "0.8.17",
+                version: "0.8.8",
             },
             {
-                version: "0.6.6",
+                version: "^0.6.6",
             },
         ],
     },

@@ -103,4 +103,16 @@ contract RandomIPFSNFT is Ownable, VRFConsumerBaseV2, ERC721URIStorage {
             revert RandomIpfsNft__TransferFailed();
         }
     }
+
+    function getMintFee() public view returns (uint256) {
+        return i_mintFee;
+    }
+
+    function getDogTokenUris(uint256 index) public view returns (string memory) {
+        return s_dogTokenUris[index];
+    }
+
+    function getTokenCounter() public view returns (uint256) {
+        return s_tokenCounter;
+    }
 }

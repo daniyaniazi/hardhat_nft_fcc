@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 error RandomIpfsNft__RangeOutOfBounds();
+error RandomIpfsNft__NeedMoreETHSent();
 
 contract RandomIPFSNFT is VRFConsumerBaseV2, ERC721URIStorage {
     // Types
@@ -24,6 +25,7 @@ contract RandomIPFSNFT is VRFConsumerBaseV2, ERC721URIStorage {
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
     uint32 private constant NUM_WORDS = 1;
     // NFT Variables
+    uint256 private immutable i_mintFee;
     uint256 private s_tokenCounter;
     uint256 internal constant MAX_CHANCE_VALUE = 100;
     string[] internal s_dogTokenUris;
@@ -35,18 +37,23 @@ contract RandomIPFSNFT is VRFConsumerBaseV2, ERC721URIStorage {
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
         uint32 callbackGasLimit,
-        string[3] memory dogTokenUris
+        string[3] memory dogTokenUris,
+        uint256 mintFee
     ) VRFConsumerBaseV2(vrfCoordinatorV2) ERC721("Rnadom IPFS NFT", "RIN") {
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
+        i_mintFee = mintFee;
     }
 
     // when mint an NFT -> Trigger chainlink VRF to get rand number
     // -> Random NFT
 
-    function requestNFT() public returns (uint256 requestId) {
+    function requestNFT() public payable returns (uint256 requestId) {
+        if (msg.value < i_mintFee) {
+            revert RandomIpfsNft__NeedMoreETHSent();
+        }
         requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,

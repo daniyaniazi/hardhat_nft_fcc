@@ -5,10 +5,11 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 error RandomIpfsNft__RangeOutOfBounds();
 
-contract RandomIPFSNFT is VRFConsumerBaseV2, ERC721 {
+contract RandomIPFSNFT is VRFConsumerBaseV2, ERC721URIStorage {
     // Types
     enum Breed {
         PUG,
@@ -25,6 +26,7 @@ contract RandomIPFSNFT is VRFConsumerBaseV2, ERC721 {
     // NFT Variables
     uint256 private s_tokenCounter;
     uint256 internal constant MAX_CHANCE_VALUE = 100;
+    string[] internal s_dogTokenUris;
     // VRF Helpers
     mapping(uint256 => address) public s_requestIdToSender;
 
@@ -32,7 +34,8 @@ contract RandomIPFSNFT is VRFConsumerBaseV2, ERC721 {
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
-        uint32 callbackGasLimit
+        uint32 callbackGasLimit,
+        string[3] memory dogTokenUris
     ) VRFConsumerBaseV2(vrfCoordinatorV2) ERC721("Rnadom IPFS NFT", "RIN") {
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
@@ -60,6 +63,7 @@ contract RandomIPFSNFT is VRFConsumerBaseV2, ERC721 {
         uint256 moddedRng = randomWords[0] % MAX_CHANCE_VALUE;
         Breed dogBreed = getBreedFromModdedRng(moddedRng);
         _safeMint(dogOwner, newItemId);
+        _setTokenURI(newItemId, s_dogTokenUris[uint256(dogBreed)]);
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {}

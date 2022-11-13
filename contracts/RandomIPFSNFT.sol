@@ -43,6 +43,7 @@ contract RandomIPFSNFT is Ownable, VRFConsumerBaseV2, ERC721URIStorage {
         string[3] memory dogTokenUris,
         uint256 mintFee
     ) VRFConsumerBaseV2(vrfCoordinatorV2) ERC721("Rnadom IPFS NFT", "RIN") {
+        s_tokenCounter = 0;
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -67,7 +68,7 @@ contract RandomIPFSNFT is Ownable, VRFConsumerBaseV2, ERC721URIStorage {
         s_requestIdToSender[requestId] = msg.sender;
     }
 
-    function fullfillRnadomWords(uint256 requestId, uint256[] memory randomWords) internal {
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
         address dogOwner = s_requestIdToSender[requestId];
         uint256 newItemId = s_tokenCounter;
         uint256 moddedRng = randomWords[0] % MAX_CHANCE_VALUE;

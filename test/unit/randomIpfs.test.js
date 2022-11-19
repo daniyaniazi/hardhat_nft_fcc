@@ -24,23 +24,23 @@ const { developmentChains } = require("../../helper.hardhat.config")
               })
           })
 
-          describe("requestNft", () => {
+          describe("requestNFT", () => {
               it("fails if payment isn't sent with the request", async function () {
-                  await expect(randomIpfsNft.requestNft()).to.be.revertedWith(
+                  await expect(randomIpfsNft.requestNFT()).to.be.revertedWith(
                       "RandomIpfsNft__NeedMoreETHSent"
                   )
               })
               it("reverts if payment amount is less than the mint fee", async function () {
                   const fee = await randomIpfsNft.getMintFee()
                   await expect(
-                      randomIpfsNft.requestNft({
+                      randomIpfsNft.requestNFT({
                           value: fee.sub(ethers.utils.parseEther("0.001")),
                       })
                   ).to.be.revertedWith("RandomIpfsNft__NeedMoreETHSent")
               })
               it("emits an event and kicks off a random word request", async function () {
                   const fee = await randomIpfsNft.getMintFee()
-                  await expect(randomIpfsNft.requestNft({ value: fee.toString() })).to.emit(
+                  await expect(randomIpfsNft.requestNFT({ value: fee.toString() })).to.emit(
                       randomIpfsNft,
                       "NftRequested"
                   )
@@ -63,12 +63,12 @@ const { developmentChains } = require("../../helper.hardhat.config")
                       })
                       try {
                           const fee = await randomIpfsNft.getMintFee()
-                          const requestNftResponse = await randomIpfsNft.requestNft({
+                          const requestNFTResponse = await randomIpfsNft.requestNFT({
                               value: fee.toString(),
                           })
-                          const requestNftReceipt = await requestNftResponse.wait(1)
+                          const requestNFTReceipt = await requestNFTResponse.wait(1)
                           await vrfCoordinatorV2Mock.fulfillRandomWords(
-                              requestNftReceipt.events[1].args.requestId,
+                              requestNFTReceipt.events[1].args.requestId,
                               randomIpfsNft.address
                           )
                       } catch (e) {
@@ -95,6 +95,14 @@ const { developmentChains } = require("../../helper.hardhat.config")
                   await expect(randomIpfsNft.getBreedFromModdedRng(100)).to.be.revertedWith(
                       "RandomIpfsNft__RangeOutOfBounds"
                   )
+              })
+          })
+
+          describe("withdraw", () => {
+              it("Only allows the owner to withdraw", async function () {
+                  const accounts = await ethers.getSigners()
+                  const randomIpfsNftConnectedContract = await randomIpfsNft.connect(accounts[1])
+                  await expect(randomIpfsNftConnectedContract.withdraw()).to.be.reverted
               })
           })
       })

@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 error RandomIpfsNft__RangeOutOfBounds();
 error RandomIpfsNft__NeedMoreETHSent();
 error RandomIpfsNft__TransferFailed();
+error RandomIpfsNft__AlreadyInitialized();
 
 contract RandomIPFSNFT is Ownable, VRFConsumerBaseV2, ERC721URIStorage {
     // Types
@@ -22,6 +23,7 @@ contract RandomIPFSNFT is Ownable, VRFConsumerBaseV2, ERC721URIStorage {
     }
 
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
+    bool private s_initialized;
     uint64 private immutable i_subscriptionId;
     bytes32 private immutable i_gasLane;
     uint32 private immutable i_callbackGasLimit;
@@ -52,6 +54,7 @@ contract RandomIPFSNFT is Ownable, VRFConsumerBaseV2, ERC721URIStorage {
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
         i_mintFee = mintFee;
+        _initializeContract(dogTokenUris);
     }
 
     // when mint an NFT -> Trigger chainlink VRF to get rand number
@@ -85,6 +88,14 @@ contract RandomIPFSNFT is Ownable, VRFConsumerBaseV2, ERC721URIStorage {
 
     function getChanceArray() public pure returns (uint256[3] memory) {
         return [10, 30, MAX_CHANCE_VALUE];
+    }
+
+    function _initializeContract(string[3] memory dogTokenUris) private {
+        if (s_initialized) {
+            revert RandomIpfsNft__AlreadyInitialized();
+        }
+        s_dogTokenUris = dogTokenUris;
+        s_initialized = true;
     }
 
     function getBreedFromModdedRng(uint256 moddedRng) public pure returns (Breed) {

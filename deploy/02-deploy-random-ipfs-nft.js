@@ -45,11 +45,12 @@ module.exports = async function ({ getNamedAccounts, deployments }) {
         tokenUris,
         networkConfig[chainId]["mintFee"],
     ]
+
     const randomIpfsNft = await deploy("RandomIPFSNFT", {
         from: deployer,
         args: arguments,
         log: true,
-        waitConfirmations: network.config.blockConfirmations || 1,
+        waitConfirmation: network.config.blockConfirmations || 1,
     })
 
     log("---------------------")

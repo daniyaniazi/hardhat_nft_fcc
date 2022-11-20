@@ -9,7 +9,7 @@ const networkConfig = {
         mintFee: "10000000000000000", // 0.01 ETH
         callbackGasLimit: "500000",
         entranceFee: ethers.utils.parseEther("0.01"),
-
+        ethUsdPriceFeed: "0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e",
         // interval: "30",
     },
     31337: {
@@ -23,9 +23,12 @@ const networkConfig = {
         // interval: "30",
     },
 }
-
+const DECIMALS = 8
+const INITIAL_ANSWER = 200000000000
 const developmentChains = ["hardhat", "localhost"]
 module.exports = {
+    DECIMALS,
+    INITIAL_ANSWER,
     networkConfig,
     developmentChains,
 }

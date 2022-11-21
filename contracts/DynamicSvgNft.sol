@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.8;
 
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "base64-sol/base64.sol";
 
@@ -23,7 +24,6 @@ contract DynamicSvgNft is ERC721 {
         string memory highSvg
     ) ERC721("Dynamic SVG NFT", "DSN") {
         s_tokenCounter = 0;
-
         s_lowImageURI = svgToImageURI(lowSvg);
         s_highImageURI = svgToImageURI(highSvg);
         i_priceFeed = AggregatorV3Interface(priceFeedAddress);
@@ -31,8 +31,10 @@ contract DynamicSvgNft is ERC721 {
 
     function mintNft(int256 highValue) public {
         s_tokenIdToHighValues[s_tokenCounter] = highValue;
+        console.log(s_tokenCounter);
+        console.logInt(s_tokenIdToHighValues[s_tokenCounter]);
         _safeMint(msg.sender, s_tokenCounter);
-        s_tokenCounter = s_tokenCounter + 1;
+        s_tokenCounter += 1;
         emit CreatedNFT(s_tokenCounter, highValue);
     }
 
@@ -48,10 +50,12 @@ contract DynamicSvgNft is ERC721 {
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(!_exists(tokenId), "URI not exist");
         (, int256 price, , , ) = i_priceFeed.latestRoundData();
+        console.logInt(price);
         string memory imageURI = s_lowImageURI;
-        if (price >= s_tokenIdToHighValues[tokenId]) {
+        if (price > s_tokenIdToHighValues[tokenId]) {
             imageURI = s_highImageURI;
         }
+
         return
             string(
                 abi.encodePacked(
@@ -70,5 +74,21 @@ contract DynamicSvgNft is ERC721 {
                     )
                 )
             );
+    }
+
+    function getLowSVG() public view returns (string memory) {
+        return s_lowImageURI;
+    }
+
+    function getHighSVG() public view returns (string memory) {
+        return s_highImageURI;
+    }
+
+    function getPriceFeed() public view returns (AggregatorV3Interface) {
+        return i_priceFeed;
+    }
+
+    function getTokenCounter() public view returns (uint256) {
+        return s_tokenCounter;
     }
 }

@@ -16,8 +16,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     } else {
         ethUsdPriceFeedAddress = networkConfig[chainId].ethUsdPriceFeed
     }
-    const lowSVG = await fs.readFileSync("./nfts/dynamic/frown.svg", { encoding: "utf8" })
-    const highSVG = await fs.readFileSync("./nfts/dynamic/happy.svg", { encoding: "utf8" })
+    const lowSVG = await fs.readFileSync("./nfts/dynamic/happy.svg", { encoding: "utf8" })
+    const highSVG = await fs.readFileSync("./nfts/dynamic/frown.svg", { encoding: "utf8" })
 
     // deploy
     arguments = [ethUsdPriceFeedAddress, lowSVG, highSVG]
